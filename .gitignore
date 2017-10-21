@@ -5,3 +5,7 @@ TritonCode/.idea/libraries
 .DS_Store
 TritonCodeServer/out/
 TritonCode/out/
+node_modules/
+Chat/ngrok
+Chat/node_modules
+TritonCodeServer/ngrok
