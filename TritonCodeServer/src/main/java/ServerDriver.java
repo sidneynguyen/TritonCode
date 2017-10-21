@@ -7,11 +7,17 @@ public class ServerDriver {
     private Document document;
     private ServerGraph serverGraph;
     private LinkedList<ServerOperation> clientOperations;
+    private String key;
 
     public ServerDriver(String data, String key) {
         document = new Document(data);
         serverGraph = new ServerGraph(key);
         clientOperations = new LinkedList<>();
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     /**

@@ -4,6 +4,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 
 import static spark.Spark.*;
@@ -28,18 +29,19 @@ public class TritonCodeServer {
     public void onConnect(Session user) throws Exception {
         String username = "User" + OperationSender.nextUserNumber++;
         OperationSender.userUsernameMap.put(user, username);
-        OperationSender.broadcastMessage(sender = "Server", msg = (username + " joined the chat"));
+        //OperationSender.broadcastMessage(sender = "Server", msg = (username + " joined the chat"));
     }
 
     @OnWebSocketClose
     public void onClose(Session user, int statusCode, String reason) {
         String username = OperationSender.userUsernameMap.get(user);
         OperationSender.userUsernameMap.remove(user);
-        OperationSender.broadcastMessage(sender = "Server", msg = (username + " left the chat"));
+        //OperationSender.broadcastMessage(sender = "Server", msg = (username + " left the chat"));
     }
 
     @OnWebSocketMessage
     public void onMessage(Session user, String message) {
+        System.out.println(message);
         if (message.contains("START:")) {
             int newlinePos = message.indexOf('\n');
             String key = message.substring(6, newlinePos);
@@ -60,7 +62,17 @@ public class TritonCodeServer {
 
             // Broadcast server message
             ServerOperation serverOperation = serverDriver.sendServerOperationToClient();
-            OperationSender.broadcastOperation(sender = "Server", msg = "DOCUMENT\n" + serverOperation.getKey() + "\n" + serverOperation.getParentKey() + "\n" + OperationParser.operationToStr(serverOperation.getOperation()));
+            OperationSender.broadcastOperation(sender = "Server", msg = "DOCUMENT\n" + serverDriver.getKey() + "\n" + serverOperation.getKey() + "\n" + serverOperation.getParentKey() + "\n" + OperationParser.operationToStr(serverOperation.getOperation()));
+        } else if (message.contains("CONNECT")) {
+            StringTokenizer tokenizer = new StringTokenizer(message, "\n");
+            tokenizer.nextElement();
+            String key = (String) tokenizer.nextElement();
+
+            try {
+                user.getRemote().sendString("START:" + key + "\n" + serverDriver.getDocument().getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

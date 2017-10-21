@@ -1,16 +1,21 @@
 import javax.websocket.*;
 import java.net.URI;
+import java.util.StringTokenizer;
 
 @ClientEndpoint
 public class WebSocketController {
     Session userSession = null;
     private MessageHandler messageHandler;
+    ClientDriver clientDriver;
+    EditorViewController controller;
 
-    public WebSocketController(URI endpointURI) {
+    public WebSocketController(URI endpointURI, String filename, String contents, EditorViewController controller) {
         try {
             WebSocketContainer container = ContainerProvider
                     .getWebSocketContainer();
             container.connectToServer(this, endpointURI);
+            clientDriver = new ClientDriver(contents, filename);
+            this.controller = controller;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -30,6 +35,34 @@ public class WebSocketController {
     public void onMessage(String message) {
         if (this.messageHandler != null)
             this.messageHandler.handleMessage(message);
+        if (message.contains("START:")) {
+            int newlinePos = message.indexOf('\n');
+            String key = message.substring(6, newlinePos);
+            String document = message.substring(newlinePos + 1);
+            clientDriver = new ClientDriver(document, key);
+            System.out.println(clientDriver.getDocument().getData());
+            controller.receivedMessage(clientDriver.getDocument().getData());
+        } else if (message.contains("DOCUMENT")) {
+            // TODO: check if file exists
+            StringTokenizer tokenizer = new StringTokenizer(message, "\n");
+            tokenizer.nextElement();
+            String key = (String) tokenizer.nextElement();
+            String editKey = (String) tokenizer.nextElement();
+            String parentKey = (String) tokenizer.nextElement();
+            String edits = (String) tokenizer.nextElement();
+
+            System.out.println("EDITS:" + edits);
+            ServerOperation operation = new ServerOperation(OperationParser.strToOperation(edits), editKey, parentKey);
+            clientDriver.enqueueServerOperation(operation);
+
+            String doc = controller.getEditorText();
+            if (!doc.equals(clientDriver.getDocument().getData())) {
+                clientDriver.applyEdits(doc);
+                clientDriver.setHasUnsentEdit(true);
+            }
+            clientDriver.receiveEdits();
+            controller.receivedMessage(clientDriver.getDocument().getData());
+        }
     }
 
     public void addMessageHandler(MessageHandler msgHandler) {
@@ -40,12 +73,27 @@ public class WebSocketController {
         this.userSession.getAsyncRemote().sendText(message);
     }
 
+    public void sendEdit(String content) {
+        if (!clientDriver.canSendEdit()) {
+            return;
+        }
+        if (content.equals(clientDriver.getDocument().getData()) && !clientDriver.hasUnsentEdit()) {
+            return;
+        }
+
+        ServerOperation operation = clientDriver.sendEdits(content);
+
+        String text = "DOCUMENT\n" + clientDriver.getKey() + "\n" + operation.getKey() + "\n" + operation.getParentKey() + "\n" + OperationParser.operationToStr(operation.getOperation());
+        this.userSession.getAsyncRemote().sendText(text);
+        System.out.println(text);
+    }
+
     public static interface MessageHandler {
         public void handleMessage(String message);
     }
 
     public static void main(String[] args) throws Exception {
-        final WebSocketController testClient = new WebSocketController(new URI("ws://localhost:3000/code"));
+        /*final WebSocketController testClient = new WebSocketController(new URI("ws://localhost:3000/code"));
         testClient.addMessageHandler(new MessageHandler() {
             @Override
             public void handleMessage(String message) {
@@ -58,6 +106,6 @@ public class WebSocketController {
         //Thread.sleep(1000);
         testClient.sendMessage("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
         System.out.println("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
-
+*/
     }
 }

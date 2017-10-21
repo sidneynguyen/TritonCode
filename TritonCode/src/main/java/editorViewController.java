@@ -8,22 +8,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.control.*;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class EditorViewController extends Application{
@@ -53,7 +48,7 @@ public class EditorViewController extends Application{
     @Override
     public void start (Stage primaryStage) throws Exception{
 
-        testClient = new WebSocketController(new URI("3a31f62f.ngrok.io"));
+        //testClient = new WebSocketController(new URI("3a31f62f.ngrok.io"));
 
 
 //        testClient.sendMessage("START:1234\nabc");
@@ -92,10 +87,10 @@ public class EditorViewController extends Application{
                     writer = new FileWriter(createdFile);
                     writer.close();
 
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
 
             }
         });
@@ -140,6 +135,7 @@ public class EditorViewController extends Application{
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                 }
             }
         });
@@ -148,7 +144,7 @@ public class EditorViewController extends Application{
         startButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-
+                start(editor.getText());
             }
         });
 
@@ -156,7 +152,7 @@ public class EditorViewController extends Application{
         connectButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-
+                connect(editor.getText());
             }
         });
 
@@ -174,14 +170,14 @@ public class EditorViewController extends Application{
                 postToServer(editor.getText());
             }
         });
-        testClient.addMessageHandler(new WebSocketController.MessageHandler() {
+        /*testClient.addMessageHandler(new WebSocketController.MessageHandler() {
             @Override
             public void handleMessage(String message) {
                 System.out.println(message);
                 receivedMessage(message);
             }
 
-        });
+        });*/
         layout.setTop(buttonLayout);
         layout.setCenter(editor);
 
@@ -202,11 +198,51 @@ public class EditorViewController extends Application{
 
     }
 
-    private void postToServer(String message){
-        System.out.println("Posted");
-        testClient.sendMessage(message+"\n");
+    public String getEditorText() {
+        return editor.getText();
     }
-    private void receivedMessage(String message){
+
+    private void start(String content) {
+        try {
+            testClient = new WebSocketController(new URI("ws://localhost:3000/code"), currentFile.getName(), content, this);
+            testClient.addMessageHandler(new WebSocketController.MessageHandler() {
+                @Override
+                public void handleMessage(String message) {
+                    System.out.println(message);
+                    //receivedMessage(message);
+                }
+
+            });
+            testClient.sendMessage("START:" + currentFile.getName() + "\n" + content);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void connect(String content) {
+        try {
+            testClient = new WebSocketController(new URI("ws://localhost:3000/code"), currentFile.getName(), content, this);
+            testClient.addMessageHandler(new WebSocketController.MessageHandler() {
+                @Override
+                public void handleMessage(String message) {
+                    System.out.println(message);
+                    //receivedMessage(message);
+                }
+
+            });
+            testClient.sendMessage("CONNECT\n" + currentFile.getName() + "\n");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void postToServer(String message){
+        //System.out.println("Posted");
+
+        //testClient.sendMessage(message+"\n");
+        testClient.sendEdit(editor.getText());
+    }
+    public void receivedMessage(String message){
         editor.setText(message);
     }
     @FXML
