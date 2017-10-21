@@ -49,7 +49,7 @@ public class EditorViewController extends Application{
     @Override
     public void start (Stage primaryStage) throws Exception{
 
-        testClient = new WebSocketController(new URI("ws://localhost:3000/code"));
+        testClient = new WebSocketController(new URI("3a31f62f.ngrok.io"));
 
 
 //        testClient.sendMessage("START:1234\nabc");
