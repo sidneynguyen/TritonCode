@@ -26,28 +26,26 @@ public class TritonCodeServer {
 
     @OnWebSocketConnect
     public void onConnect(Session user) throws Exception {
-        String username = "User" + Chat.nextUserNumber++;
-        Chat.userUsernameMap.put(user, username);
-        Chat.broadcastMessage(sender = "Server", msg = (username + " joined the chat"));
+        String username = "User" + OperationSender.nextUserNumber++;
+        OperationSender.userUsernameMap.put(user, username);
+        OperationSender.broadcastMessage(sender = "Server", msg = (username + " joined the chat"));
     }
 
     @OnWebSocketClose
     public void onClose(Session user, int statusCode, String reason) {
-        String username = Chat.userUsernameMap.get(user);
-        Chat.userUsernameMap.remove(user);
-        Chat.broadcastMessage(sender = "Server", msg = (username + " left the chat"));
+        String username = OperationSender.userUsernameMap.get(user);
+        OperationSender.userUsernameMap.remove(user);
+        OperationSender.broadcastMessage(sender = "Server", msg = (username + " left the chat"));
     }
 
     @OnWebSocketMessage
     public void onMessage(Session user, String message) {
-        //Chat.broadcastMessage(sender = Chat.userUsernameMap.get(user), msg = message);
         if (message.contains("START:")) {
             int newlinePos = message.indexOf('\n');
             String key = message.substring(6, newlinePos);
             String document = message.substring(newlinePos + 1);
-            System.out.println(key);
-            System.out.println(document);
             serverDriver = new ServerDriver(document, key);
+            System.out.println(serverDriver.getDocument().getData());
         } else if (message.contains("DOCUMENT")) {
             // TODO: check if file exists
             StringTokenizer tokenizer = new StringTokenizer(message, "\n");
@@ -56,13 +54,13 @@ public class TritonCodeServer {
             String editKey = (String) tokenizer.nextElement();
             String parentKey = (String) tokenizer.nextElement();
             String edits = (String) tokenizer.nextElement();
-            System.out.println(key);
-            System.out.println(editKey);
-            System.out.println(parentKey);
-            System.out.println(edits);
             serverDriver.enqueueClientOperation(new ServerOperation(OperationParser.strToOperation(edits), editKey, parentKey));
             serverDriver.processChange();
             System.out.println(serverDriver.getDocument().getData());
+
+            // Broadcast server message
+            ServerOperation serverOperation = serverDriver.sendServerOperationToClient();
+            OperationSender.broadcastOperation(sender = "Server", msg = "DOCUMENT\n" + serverOperation.getKey() + "\n" + serverOperation.getParentKey() + "\n" + OperationParser.operationToStr(serverOperation.getOperation()));
         }
     }
 }

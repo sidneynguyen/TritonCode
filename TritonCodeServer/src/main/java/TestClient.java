@@ -54,10 +54,10 @@ public class TestClient {
         });
 
         testClient.sendMessage("START:1234\nabc");
-        System.out.println("START:1234\nabc");
         //Thread.sleep(1000);
         testClient.sendMessage("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
-        System.out.println("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
-
+        while (true) {
+            Thread.sleep(1000);
+        }
     }
 }

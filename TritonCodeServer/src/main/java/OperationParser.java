@@ -20,4 +20,19 @@ public class OperationParser {
         }
         return operation;
     }
+
+    public static String operationToStr(Operation operation) {
+        String opStr = "";
+        for (int i = 0; i < operation.size(); i++) {
+            OperationComponent op = operation.get(i);
+            if (op.getOperationType() == OperationComponent.OP_COMP_INSERT) {
+                opStr += "I" + op.getValue() + ",";
+            } else if (op.getOperationType() == OperationComponent.OP_COMP_DELETE) {
+                opStr += "D" + op.getValue() + ",";
+            } else {
+                opStr += "R" + op.getLength() + ",";
+            }
+        }
+        return opStr;
+    }
 }
