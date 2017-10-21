@@ -34,6 +34,10 @@ public class EditorViewController extends Application{
     @FXML
     private Button openButton;
     @FXML
+    private Button startButton;
+    @FXML
+    private Button connectButton;
+    @FXML
     private TextArea editor;
 
     private WebSocketController testClient;
@@ -139,8 +143,25 @@ public class EditorViewController extends Application{
                 }
             }
         });
+
+        startButton = new Button("Start");
+        startButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
+            @Override
+            public void handle(javafx.event.ActionEvent event) {
+
+            }
+        });
+
+        connectButton = new Button("Connect");
+        connectButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
+            @Override
+            public void handle(javafx.event.ActionEvent event) {
+
+            }
+        });
+
         HBox buttonLayout = new HBox();
-        buttonLayout.getChildren().addAll(newButton,saveButton,openButton);
+        buttonLayout.getChildren().addAll(newButton,saveButton,openButton, startButton, connectButton);
         BorderPane layout = new BorderPane();
 
         editor = new TextArea();
