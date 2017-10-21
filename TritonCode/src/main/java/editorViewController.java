@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -19,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,14 +36,28 @@ public class editorViewController extends Application{
     @FXML
     private TextArea editor;
 
-    public static void main(String[] args) {
+    private WebSocketController testClient;
+
+    private File currentFile;
+    public static void main(String[] args) throws Exception{
         System.out.println("Hello World");
 
         launch(args );
+
     }
 
     @Override
     public void start (Stage primaryStage) throws Exception{
+
+        testClient = new WebSocketController(new URI("ws://localhost:3000/code"));
+
+
+        testClient.sendMessage("START:1234\nabc");
+        System.out.println("START:1234\nabc");
+        //Thread.sleep(1000);
+        testClient.sendMessage("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
+        System.out.println("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
+
 
         Parent root = FXMLLoader.load(getClass().getResource("textEditor.fxml"));
 
@@ -50,12 +66,14 @@ public class editorViewController extends Application{
         newButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-                Path currentPath = Paths.get("");
-                String pathString = currentPath.toAbsolutePath().toString();
-                System.out.println(pathString);
-                File file = new File(""+pathString+"/test.txt");
+                FileChooser fileChooser = new FileChooser();
+                File createdFile = fileChooser.showSaveDialog(primaryStage);
+                fileChooser.setInitialDirectory( new File("~/untitle.txt"));
+
+                currentFile = createdFile;
+                System.out.println(createdFile);
                 try {
-                    if (file.createNewFile()){
+                    if (createdFile.createNewFile()){
 
                         System.out.println("Created File test.txt");
                     }else {
@@ -67,8 +85,7 @@ public class editorViewController extends Application{
 
                 FileWriter writer = null;
                 try {
-                    writer = new FileWriter(file);
-                    writer.write("fdskjhfs\tdjf\njksadhf");
+                    writer = new FileWriter(createdFile);
                     writer.close();
 
 
@@ -83,7 +100,17 @@ public class editorViewController extends Application{
         saveButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-                System.out.println("save");
+                if (currentFile != null){
+                    FileWriter writer = null;
+                    try {
+                        writer = new FileWriter(currentFile);
+                        writer.write(editor.getText());
+                        writer.close();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -93,6 +120,7 @@ public class editorViewController extends Application{
             public void handle(javafx.event.ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 File selectedFile = fileChooser.showOpenDialog(primaryStage);
+                currentFile = selectedFile;
                 if (selectedFile != null){
                     try {
                         String text = "";
@@ -119,7 +147,20 @@ public class editorViewController extends Application{
         editor.setPrefSize(layout.getWidth(), layout.getHeight());
         editor.setWrapText(true);
 
+        editor.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                postToServer(editor.getText());
+            }
+        });
+        testClient.addMessageHandler(new WebSocketController.MessageHandler() {
+            @Override
+            public void handleMessage(String message) {
+                System.out.println(message);
+                receivedMessage(message);
+            }
 
+        });
         layout.setTop(buttonLayout);
         layout.setCenter(editor);
 
@@ -140,6 +181,13 @@ public class editorViewController extends Application{
 
     }
 
+    private void postToServer(String message){
+        System.out.println("Posted");
+        testClient.sendMessage(message);
+    }
+    private void receivedMessage(String message){
+        editor.setText(message);
+    }
     @FXML
     protected void handleNewButtonAction (ActionEvent event){
 
