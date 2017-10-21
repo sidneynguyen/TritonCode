@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class editorViewController extends Application{
+public class EditorViewController extends Application{
     @FXML
     private Button newButton;
     @FXML
@@ -52,11 +52,11 @@ public class editorViewController extends Application{
         testClient = new WebSocketController(new URI("ws://localhost:3000/code"));
 
 
-        testClient.sendMessage("START:1234\nabc");
-        System.out.println("START:1234\nabc");
-        //Thread.sleep(1000);
-        testClient.sendMessage("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
-        System.out.println("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
+//        testClient.sendMessage("START:1234\nabc");
+//        System.out.println("START:1234\nabc");
+//        //Thread.sleep(1000);
+//        testClient.sendMessage("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
+//        System.out.println("DOCUMENT\n1234\n4321\n1234\nIx,R3,\n");
 
 
         Parent root = FXMLLoader.load(getClass().getResource("textEditor.fxml"));
@@ -147,7 +147,7 @@ public class editorViewController extends Application{
         editor.setPrefSize(layout.getWidth(), layout.getHeight());
         editor.setWrapText(true);
 
-        editor.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        editor.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 postToServer(editor.getText());
@@ -183,7 +183,7 @@ public class editorViewController extends Application{
 
     private void postToServer(String message){
         System.out.println("Posted");
-        testClient.sendMessage(message);
+        testClient.sendMessage(message+"\n");
     }
     private void receivedMessage(String message){
         editor.setText(message);
