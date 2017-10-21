@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TritonCode.iml" filepath="$PROJECT_DIR$/.idea/modules/TritonCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TritonCode_main.iml" filepath="$PROJECT_DIR$/.idea/modules/TritonCode_main.iml" group="TritonCode" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TritonCode_test.iml" filepath="$PROJECT_DIR$/.idea/modules/TritonCode_test.iml" group="TritonCode" />
+    </modules>
+  </component>
+</project>
