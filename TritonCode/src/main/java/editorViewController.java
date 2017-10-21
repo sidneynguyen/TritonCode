@@ -242,9 +242,13 @@ public class EditorViewController extends Application{
         //testClient.sendMessage(message+"\n");
         testClient.sendEdit(editor.getText());
     }
-    public void receivedMessage(String message){
+
+    public void receivedMessage(String message) {
+        int position = editor.getCaretPosition();
         editor.setText(message);
+        editor.positionCaret(position);
     }
+
     @FXML
     protected void handleNewButtonAction (ActionEvent event){
 
