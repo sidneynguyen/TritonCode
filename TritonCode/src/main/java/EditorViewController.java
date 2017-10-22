@@ -9,6 +9,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -180,8 +182,15 @@ public class EditorViewController extends Application{
             }
 
         });*/
+        WebView chatWindow = new WebView();
+        WebEngine webEngine = chatWindow.getEngine();
+        webEngine.load("http://d638a152.ngrok.io");
+        chatWindow.setPrefHeight(editor.getPrefHeight());
+        chatWindow.setPrefWidth(150);
         layout.setTop(buttonLayout);
         layout.setCenter(editor);
+        layout.setRight(chatWindow);
+
 
 
         Scene scene = new Scene(layout, 600, 400);
