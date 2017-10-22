@@ -9,6 +9,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -67,31 +69,33 @@ public class EditorViewController extends Application{
             public void handle(javafx.event.ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 File createdFile = fileChooser.showSaveDialog(primaryStage);
-                fileChooser.setInitialDirectory( new File("~/untitle.txt"));
+                fileChooser.setInitialDirectory(new File("~/untitle.txt"));
 
                 currentFile = createdFile;
                 System.out.println(createdFile);
-                try {
-                    if (createdFile.createNewFile()){
+                if (createdFile != null) {
+                    try {
+                        if (createdFile.createNewFile()) {
 
-                        System.out.println("Created File test.txt");
-                    }else {
-                        System.out.println("Dup");
+                            System.out.println("Created File test.txt");
+                        } else {
+                            System.out.println("Dup");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+//                FileWriter writer = null;
+//                try {
+//                    writer = new FileWriter(createdFile);
+//                    writer.close();
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+
                 }
-
-                FileWriter writer = null;
-                try {
-                    writer = new FileWriter(createdFile);
-                    writer.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
             }
         });
 
@@ -178,8 +182,15 @@ public class EditorViewController extends Application{
             }
 
         });*/
+        WebView chatWindow = new WebView();
+        WebEngine webEngine = chatWindow.getEngine();
+        webEngine.load("http://d638a152.ngrok.io");
+        chatWindow.setPrefHeight(editor.getPrefHeight());
+        chatWindow.setPrefWidth(150);
         layout.setTop(buttonLayout);
         layout.setCenter(editor);
+        layout.setRight(chatWindow);
+
 
 
         Scene scene = new Scene(layout, 600, 400);
@@ -213,7 +224,7 @@ public class EditorViewController extends Application{
                 }
 
             });
-            testClient.sendMessage("START:" + currentFile.getName() + "\n" + content);
+            testClient.sendMessage("START:" + currentFile.getName() + (char) 0 + content);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -230,7 +241,7 @@ public class EditorViewController extends Application{
                 }
 
             });
-            testClient.sendMessage("CONNECT\n" + currentFile.getName() + "\n");
+            testClient.sendMessage("CONNECT" + (char) 0 + currentFile.getName() + (char) 0);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -242,9 +253,13 @@ public class EditorViewController extends Application{
         //testClient.sendMessage(message+"\n");
         testClient.sendEdit(editor.getText());
     }
-    public void receivedMessage(String message){
+
+    public void receivedMessage(String message) {
+        int position = editor.getCaretPosition();
         editor.setText(message);
+        editor.positionCaret(position);
     }
+
     @FXML
     protected void handleNewButtonAction (ActionEvent event){
 

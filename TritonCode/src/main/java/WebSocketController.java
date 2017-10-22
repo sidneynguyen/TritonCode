@@ -36,7 +36,7 @@ public class WebSocketController {
         if (this.messageHandler != null)
             this.messageHandler.handleMessage(message);
         if (message.contains("START:")) {
-            int newlinePos = message.indexOf('\n');
+            int newlinePos = message.indexOf((char) 0);
             String key = message.substring(6, newlinePos);
             String document = message.substring(newlinePos + 1);
             clientDriver = new ClientDriver(document, key);
@@ -44,7 +44,7 @@ public class WebSocketController {
             controller.receivedMessage(clientDriver.getDocument().getData());
         } else if (message.contains("DOCUMENT")) {
             // TODO: check if file exists
-            StringTokenizer tokenizer = new StringTokenizer(message, "\n");
+            StringTokenizer tokenizer = new StringTokenizer(message, "" + (char) 0);
             tokenizer.nextElement();
             String key = (String) tokenizer.nextElement();
             String editKey = (String) tokenizer.nextElement();
@@ -83,7 +83,7 @@ public class WebSocketController {
 
         ServerOperation operation = clientDriver.sendEdits(content);
 
-        String text = "DOCUMENT\n" + clientDriver.getKey() + "\n" + operation.getKey() + "\n" + operation.getParentKey() + "\n" + OperationParser.operationToStr(operation.getOperation());
+        String text = "DOCUMENT" + (char) 0 + clientDriver.getKey() + (char) 0 + operation.getKey() + (char) 0 + operation.getParentKey() + (char) 0 + OperationParser.operationToStr(operation.getOperation());
         this.userSession.getAsyncRemote().sendText(text);
         System.out.println(text);
     }
