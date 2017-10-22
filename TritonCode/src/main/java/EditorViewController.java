@@ -219,7 +219,8 @@ public class EditorViewController extends Application{
 
     private void start(String content) {
         try {
-            testClient = new WebSocketController(new URI("ws://localhost:3000/code"), currentFile.getName(), content, this);
+            testClient = new WebSocketController(new URI("ws://tritoncode.herokuapp.com/code"), currentFile.getName(), content, this);
+            //testClient = new WebSocketController(new URI("ws://localhost:4567/code"), currentFile.getName(), content, this);
             testClient.addMessageHandler(new WebSocketController.MessageHandler() {
                 @Override
                 public void handleMessage(String message) {
@@ -236,7 +237,8 @@ public class EditorViewController extends Application{
 
     private void connect(String content) {
         try {
-            testClient = new WebSocketController(new URI("ws://localhost:3000/code"), currentFile.getName(), content, this);
+            testClient = new WebSocketController(new URI("ws://tritoncode.herokuapp.com/code"), currentFile.getName(), content, this);
+            //testClient = new WebSocketController(new URI("ws://localhost:4567/code"), currentFile.getName(), content, this);
             testClient.addMessageHandler(new WebSocketController.MessageHandler() {
                 @Override
                 public void handleMessage(String message) {

@@ -49,7 +49,10 @@ public class WebSocketController {
             String key = (String) tokenizer.nextElement();
             String editKey = (String) tokenizer.nextElement();
             String parentKey = (String) tokenizer.nextElement();
-            String edits = (String) tokenizer.nextElement();
+            String edits = "";
+            if (tokenizer.hasMoreElements()) {
+                edits = (String) tokenizer.nextElement();
+            }
 
             System.out.println("EDITS:" + edits);
             ServerOperation operation = new ServerOperation(OperationParser.strToOperation(edits), editKey, parentKey);
