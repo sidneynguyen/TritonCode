@@ -184,7 +184,7 @@ public class EditorViewController extends Application{
         });*/
         WebView chatWindow = new WebView();
         WebEngine webEngine = chatWindow.getEngine();
-        webEngine.load("http://d638a152.ngrok.io");
+        webEngine.load("https://tritoncodechat.herokuapp.com");
         chatWindow.setPrefHeight(editor.getPrefHeight());
         chatWindow.setPrefWidth(150);
         layout.setTop(buttonLayout);
