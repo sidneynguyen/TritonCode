@@ -67,31 +67,33 @@ public class EditorViewController extends Application{
             public void handle(javafx.event.ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 File createdFile = fileChooser.showSaveDialog(primaryStage);
-                fileChooser.setInitialDirectory( new File("~/untitle.txt"));
+                fileChooser.setInitialDirectory(new File("~/untitle.txt"));
 
                 currentFile = createdFile;
                 System.out.println(createdFile);
-                try {
-                    if (createdFile.createNewFile()){
+                if (createdFile != null) {
+                    try {
+                        if (createdFile.createNewFile()) {
 
-                        System.out.println("Created File test.txt");
-                    }else {
-                        System.out.println("Dup");
+                            System.out.println("Created File test.txt");
+                        } else {
+                            System.out.println("Dup");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+//                FileWriter writer = null;
+//                try {
+//                    writer = new FileWriter(createdFile);
+//                    writer.close();
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+
                 }
-
-                FileWriter writer = null;
-                try {
-                    writer = new FileWriter(createdFile);
-                    writer.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
             }
         });
 
