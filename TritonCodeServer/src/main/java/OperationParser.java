@@ -16,7 +16,6 @@ public class OperationParser {
                 String value = unparsedOp.substring(1);
                 operation.add(new OperationComponent(OperationComponent.OP_COMP_DELETE, value, value.length()));
             }
-
         }
         return operation;
     }

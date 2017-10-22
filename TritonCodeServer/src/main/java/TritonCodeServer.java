@@ -43,14 +43,14 @@ public class TritonCodeServer {
     public void onMessage(Session user, String message) {
         System.out.println(message);
         if (message.contains("START:")) {
-            int newlinePos = message.indexOf('\n');
+            int newlinePos = message.indexOf((char) 0);
             String key = message.substring(6, newlinePos);
             String document = message.substring(newlinePos + 1);
             serverDriver = new ServerDriver(document, key);
             System.out.println(serverDriver.getDocument().getData());
         } else if (message.contains("DOCUMENT")) {
             // TODO: check if file exists
-            StringTokenizer tokenizer = new StringTokenizer(message, "\n");
+            StringTokenizer tokenizer = new StringTokenizer(message, "" + (char) 0);
             tokenizer.nextElement();
             String key = (String) tokenizer.nextElement();
             String editKey = (String) tokenizer.nextElement();
@@ -62,14 +62,14 @@ public class TritonCodeServer {
 
             // Broadcast server message
             ServerOperation serverOperation = serverDriver.sendServerOperationToClient();
-            OperationSender.broadcastOperation(sender = "Server", msg = "DOCUMENT\n" + serverDriver.getKey() + "\n" + serverOperation.getKey() + "\n" + serverOperation.getParentKey() + "\n" + OperationParser.operationToStr(serverOperation.getOperation()));
+            OperationSender.broadcastOperation(sender = "Server", msg = "DOCUMENT" + (char) 0 + serverDriver.getKey() + (char) 0 + serverOperation.getKey() + (char) 0 + serverOperation.getParentKey() + (char) 0 + OperationParser.operationToStr(serverOperation.getOperation()));
         } else if (message.contains("CONNECT")) {
-            StringTokenizer tokenizer = new StringTokenizer(message, "\n");
+            StringTokenizer tokenizer = new StringTokenizer(message, "" + (char) 0);
             tokenizer.nextElement();
             String key = (String) tokenizer.nextElement();
 
             try {
-                user.getRemote().sendString("START:" + key + "\n" + serverDriver.getDocument().getData());
+                user.getRemote().sendString("START:" + key + (char) 0 + serverDriver.getDocument().getData());
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -213,7 +213,7 @@ public class EditorViewController extends Application{
                 }
 
             });
-            testClient.sendMessage("START:" + currentFile.getName() + "\n" + content);
+            testClient.sendMessage("START:" + currentFile.getName() + (char) 0 + content);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -230,7 +230,7 @@ public class EditorViewController extends Application{
                 }
 
             });
-            testClient.sendMessage("CONNECT\n" + currentFile.getName() + "\n");
+            testClient.sendMessage("CONNECT" + (char) 0 + currentFile.getName() + (char) 0);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
