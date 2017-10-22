@@ -148,7 +148,9 @@ public class EditorViewController extends Application{
         startButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-                start(editor.getText());
+                if (currentFile != null) {
+                    start(editor.getText());
+                }
             }
         });
 
@@ -156,7 +158,9 @@ public class EditorViewController extends Application{
         connectButton.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
             @Override
             public void handle(javafx.event.ActionEvent event) {
-                connect(editor.getText());
+                if (currentFile != null) {
+                    connect(editor.getText());
+                }
             }
         });
 
@@ -251,7 +255,9 @@ public class EditorViewController extends Application{
         //System.out.println("Posted");
 
         //testClient.sendMessage(message+"\n");
-        testClient.sendEdit(editor.getText());
+        if (testClient != null) {
+            testClient.sendEdit(editor.getText());
+        }
     }
 
     public void receivedMessage(String message) {
