@@ -2,7 +2,7 @@ import java.util.StringTokenizer;
 
 public class OperationParser {
     public static Operation strToOperation(String opStr) {
-        StringTokenizer tokenizer = new StringTokenizer(opStr, ",");
+        StringTokenizer tokenizer = new StringTokenizer(opStr, "" + (char) 7);
         Operation operation = new Operation();
         while (tokenizer.hasMoreElements()) {
             String unparsedOp = (String) tokenizer.nextElement();
@@ -25,11 +25,11 @@ public class OperationParser {
         for (int i = 0; i < operation.size(); i++) {
             OperationComponent op = operation.get(i);
             if (op.getOperationType() == OperationComponent.OP_COMP_INSERT) {
-                opStr += "I" + op.getValue() + ",";
+                opStr += "I" + op.getValue() + (char) 7;
             } else if (op.getOperationType() == OperationComponent.OP_COMP_DELETE) {
-                opStr += "D" + op.getValue() + ",";
+                opStr += "D" + op.getValue() + (char) 7;
             } else {
-                opStr += "R" + op.getLength() + ",";
+                opStr += "R" + op.getLength() + (char) 7;
             }
         }
         return opStr;
